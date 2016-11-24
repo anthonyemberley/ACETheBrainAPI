@@ -1,1 +1,1 @@
-web: gunicorn ACETheBrainAPI:app
+web: gunicorn AceAPI:app
