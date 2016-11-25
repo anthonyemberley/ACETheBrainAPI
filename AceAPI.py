@@ -1,9 +1,16 @@
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from flask_restful import reqparse
+import os
 
 app = Flask(__name__)
+#app.config.from_object(os.environ['APP_SETTINGS'])
 api = Api(app)
+
+
+
+
+
 
 class HelloWorld(Resource):
     def get(self):
