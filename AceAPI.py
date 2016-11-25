@@ -12,10 +12,6 @@ api = Api(app)
 
 from models import User
 
-
-
-
-
 class HelloWorld(Resource):
     def get(self):
         return {'hello': 'world'}
@@ -48,7 +44,7 @@ class CreateUser(Resource):
                 return {'error': "Username or email already taken"}
         return {'Email': args['email'], 'Password': args['password'], 'Username': args['password']}
 
-api.add_resource(CreateUser, '/CreateUser')
+api.add_resource(CreateUser, '/api/CreateUser')
 
 
 class LoginUser(Resource):
@@ -73,12 +69,9 @@ class LoginUser(Resource):
 
         except Exception as e:
 	            return {'error': str(e)}
-        
-       
 
 
-
-api.add_resource(LoginUser, '/LoginUser')
+api.add_resource(LoginUser, '/api/LoginUser')
 
 if __name__ == '__main__':
     app.run(debug=True)
