@@ -2,11 +2,15 @@ from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from flask_restful import reqparse
 import os
+from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-#app.config.from_object(os.environ['APP_SETTINGS'])
+app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 api = Api(app)
 
+from models import User
 
 
 
@@ -24,14 +28,14 @@ class CreateUser(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, help='Email required to create user', required=True)
         parser.add_argument('password', type=str, help='Password required to create user', required=True)
+        parser.add_argument('username', type=str, help='Username required to create user', required=True)
         args = parser.parse_args()
 
         _userEmail = args['email']
         _userPassword = args['password']
-        print _userPassword
-        print _userEmail
+        _userUsername = args['username']
 
-        return {'Email': args['email'], 'Password': args['password']}
+        return {'Email': args['email'], 'Password': args['password'], 'Username': args['password']}
 
 
 
