@@ -11,7 +11,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 api = Api(app)
 
+
 from models import User, Response
+import LOF
+possible_questions = ["What did you do today?", "How are you feeling?", "What did you eat for lunch yesterday?", "What is your plan for today?"]
+outlier_factor_threshold = 2
 
 class CreateUser(Resource):
     def post(self):
@@ -95,21 +99,34 @@ class NewQuestionResponse(Resource):
         _pauses = args['pauses']
 
 
+        newResponse = None
+
+
         try:
-                newResponse = Response(
-                    user_id = _userID,
-                    response = _response,
-                    response_time = _responseTime,
-                    errors = _errors,
-                    pauses = _pauses,
-                    question = _question
-                )
-                db.session.add(newResponse)
-                db.session.commit()
+            newResponse = Response(
+                user_id = _userID,
+                response = _response,
+                response_time = _responseTime,
+                errors = _errors,
+                pauses = _pauses,
+                question = _question
+            )
+
+
+            db.session.add(newResponse)
+            db.session.commit()
 
         except Exception as e:
                 return {'error': "Error inserting into db"}, 400
-        return {'user_id': args['user_id'], 'question': args['question'], 'response': args['response'], 'response_time': args['response_time'], 'errors': args['errors'], 'pauses': args['pauses']}, 200
+        
+        outlier_factor = LOF.get_local_outlier_factor(_question, newResponse, _userID)
+
+        if type(outlier_factor) is str:
+            return {"response": "Not enough question responses yet"}
+        elif outlier_factor < outlier_factor_threshold:
+            return {"response": "Normal response"}
+        else:
+            return {"response": "Response seems different, consider seeing an Athletic Trainer"}
 
 api.add_resource(NewQuestionResponse, '/api/NewResponse')
 
@@ -117,15 +134,16 @@ api.add_resource(NewQuestionResponse, '/api/NewResponse')
 class NewQuestion(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('questions_asked', type=str, action='append', help='Please provide questions already asked', required=True)
+        parser.add_argument('questions_asked', type=str, action='append', help='Please provide questions already asked')
         args = parser.parse_args()
 
 
         _questionsAsked = args["questions_asked"]
-        possible_questions = ["What did you do today?", "How are you feeling?", "What did you eat for lunch yesterday?", "What is your plan for today?"]
-        for question in _questionsAsked:
-            print(question)
-        if len(_questionsAsked) == len(possible_questions):
+        if _questionsAsked == None:
+            _questionsAsked = []
+        
+        
+        if  len(_questionsAsked) == len(possible_questions):
             random_question = "Thank you, that is all the questions for today"
         else:
             random_question = random.choice(possible_questions)
