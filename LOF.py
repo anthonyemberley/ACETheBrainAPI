@@ -86,19 +86,6 @@ class LOF:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 def k_distance(k, response, responses, distance_function=euclidian_distance):
     #TODO: implement caching
     """Computes the k-distance of instance as defined in paper. It also gatheres the set of k-distance neighbours.

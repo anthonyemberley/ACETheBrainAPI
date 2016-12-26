@@ -126,7 +126,7 @@ class NewQuestionResponse(Resource):
         elif outlier_factor < outlier_factor_threshold:
             return {"response": "Normal response"}
         else:
-            return {"response": "Response seems different, consider seeing an Athletic Trainer"}
+            return {"response": "Response seems abnormal, consider seeing an Athletic Trainer"}
 
 api.add_resource(NewQuestionResponse, '/api/NewResponse')
 
